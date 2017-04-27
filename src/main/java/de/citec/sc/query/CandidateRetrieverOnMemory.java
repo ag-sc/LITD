@@ -54,39 +54,39 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
         
         //English files
         resourceIndexEN = new ConcurrentHashMap<>(5000000);
-        loadFiles(directory + "/en/resourceFiles", resourceIndexEN);
+        loadFiles(directory + "/en/resourceFiles", resourceIndexEN, Language.EN);
         classIndexEN = new ConcurrentHashMap<>(1000);
-        loadFiles(directory + "/en/resourceFiles", classIndexEN);
+        loadFiles(directory + "/en/classFiles", classIndexEN, Language.EN);
         predicateIndexEN = new ConcurrentHashMap<>(5000);
-        loadFiles(directory + "/en/resourceFiles", predicateIndexEN);
+        loadFiles(directory + "/en/predicateFiles", predicateIndexEN, Language.EN);
         matollPredicateIndexEN = new ConcurrentHashMap<>(10000);
-        loadFiles(directory + "/en/resourceFiles", matollPredicateIndexEN);
+        loadFiles(directory + "/en/matollFiles", matollPredicateIndexEN, Language.EN);
         matollRestrictionClassIndexEN = new ConcurrentHashMap<>(1000);
-        loadFiles(directory + "/en/resourceFiles", matollRestrictionClassIndexEN);
+        loadFiles(directory + "/en/matollAdjectiveFiles", matollRestrictionClassIndexEN, Language.EN);
         
         //German files
         resourceIndexDE = new ConcurrentHashMap<>(5000000);
-        loadFiles(directory + "/en/resourceFiles", resourceIndexDE);
+        loadFiles(directory + "/de/resourceFiles", resourceIndexDE, Language.DE);
         classIndexDE = new ConcurrentHashMap<>(1000);
-        loadFiles(directory + "/en/resourceFiles", classIndexDE);
+        loadFiles(directory + "/de/classFiles", classIndexDE, Language.DE);
         predicateIndexDE = new ConcurrentHashMap<>(5000);
-        loadFiles(directory + "/en/resourceFiles", predicateIndexDE);
+        loadFiles(directory + "/de/predicateFiles", predicateIndexDE, Language.DE);
         matollPredicateIndexDE = new ConcurrentHashMap<>(10000);
-        loadFiles(directory + "/en/resourceFiles", matollPredicateIndexDE);
+        loadFiles(directory + "/de/matollFiles", matollPredicateIndexDE, Language.DE);
         matollRestrictionClassIndexDE = new ConcurrentHashMap<>(1000);
-        loadFiles(directory + "/en/resourceFiles", matollRestrictionClassIndexDE);
         
-        //Spanish files
+        //English files
         resourceIndexES = new ConcurrentHashMap<>(5000000);
-        loadFiles(directory + "/en/resourceFiles", resourceIndexES);
+        loadFiles(directory + "/es/resourceFiles", resourceIndexES, Language.ES);
         classIndexES = new ConcurrentHashMap<>(1000);
-        loadFiles(directory + "/en/resourceFiles", classIndexES);
+        loadFiles(directory + "/es/classFiles", classIndexES, Language.ES);
         predicateIndexES = new ConcurrentHashMap<>(5000);
-        loadFiles(directory + "/en/resourceFiles", predicateIndexES);
+        loadFiles(directory + "/es/predicateFiles", predicateIndexES, Language.ES);
         matollPredicateIndexES = new ConcurrentHashMap<>(10000);
-        loadFiles(directory + "/en/resourceFiles", matollPredicateIndexES);
+        loadFiles(directory + "/es/matollFiles", matollPredicateIndexES, Language.ES);
         matollRestrictionClassIndexES = new ConcurrentHashMap<>(1000);
-        loadFiles(directory + "/en/resourceFiles", matollRestrictionClassIndexES);
+        
+        
     }
 
     @Override
@@ -336,7 +336,7 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
 
     }
 
-    private void loadFiles(String directory, ConcurrentHashMap<String, List<Instance>> map) {
+    private void loadFiles(String directory, ConcurrentHashMap<String, List<Instance>> map, Language lang) {
 
         File indexFolder = new File(directory);
         File[] listOfFiles = indexFolder.listFiles();
@@ -346,7 +346,7 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
 
                 String fileExtension = listOfFiles[d].getName().substring(listOfFiles[d].getName().lastIndexOf(".") + 1);
 
-                if (fileExtension.equals("ttl")) {
+                if (fileExtension.equals("ttl") || fileExtension.equals("txt")) {
 
                     String filePath = listOfFiles[d].getPath();
 
@@ -368,9 +368,26 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
                                 instance = new Instance(uri, freq);
 
                             }
+                            if (c.length == 4) {
+
+                                label = c[0].toLowerCase();
+                                String preposition = c[1];
+                                String pos = "";
+                                String frame = "";
+                                String uri = c[2];
+                                String subj = "";
+                                String obj = "";
+                                int freq = Integer.parseInt(c[3]);
+                                
+                                instance = new Instance(uri, preposition, pos, frame, subj, obj, freq);
+
+                            }
                             if (c.length == 2) {
 
                                 label = c[1].toLowerCase();
+                                
+                                label = label.replace("@"+lang.name().toLowerCase(), "");
+                                
                                 String uri = c[0];
                                 int freq = 1;
 
