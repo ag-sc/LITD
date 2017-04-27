@@ -6,7 +6,8 @@
 
 package de.citec.sc.litd;
 
-import de.citec.sc.query.AnchorRetriever;
+import de.citec.sc.query.ResourceRetriever;
+import de.citec.sc.query.CandidateRetriever;
 import de.citec.sc.query.CandidateRetrieverOnLucene;
 import de.citec.sc.query.CandidateRetrieverOnMemory;
 import de.citec.sc.query.ClassRetriever;
@@ -21,15 +22,20 @@ public class TestQuery {
     
     public static void main(String[] args) {
         
-        CandidateRetrieverOnLucene lucene = new CandidateRetrieverOnLucene(false, "luceneIndex/resourceIndex","luceneIndex/classIndex", "luceneIndex/predicateIndex", "luceneIndex/matollIndex");
-        System.out.println(lucene.getAllPredicates("cross", 10));
-        System.out.println(lucene.getPredicatesInDBpedia("cross~0.8", 10, true));
-        System.out.println(lucene.getAllClasses("actor", 10, true));
-        System.out.println(lucene.getAllClasses("player", 10, true));
-        System.out.println(lucene.getAllResources("jordan", 10));
-        System.out.println(lucene.getPredicatesInDBpedia("author", 10, false));
-        System.out.println(lucene.getPredicatesInMatoll("married", 10));
-        System.out.println(lucene.getRestrictionClasses("catholic", 10));
+        CandidateRetrieverOnLucene lucene = new CandidateRetrieverOnLucene(false, "luceneIndex");
+        
+        System.out.println(lucene.getAllResources("obama", 10, CandidateRetriever.Language.EN));
+        System.out.println(lucene.getAllResources("obama", 10, CandidateRetriever.Language.DE));
+        System.out.println(lucene.getAllResources("obama", 10, CandidateRetriever.Language.ES));
+        
+        System.out.println(lucene.getAllPredicates("cross", 10, CandidateRetriever.Language.EN));
+        System.out.println(lucene.getPredicatesInDBpedia("cross~0.8", 10, true, CandidateRetriever.Language.EN));
+        System.out.println(lucene.getAllClasses("spieler", 10, true, CandidateRetriever.Language.DE));
+        System.out.println(lucene.getAllClasses("trabajo", 10, true, CandidateRetriever.Language.ES));
+        System.out.println(lucene.getAllResources("jordan", 10, CandidateRetriever.Language.EN));
+        System.out.println(lucene.getPredicatesInDBpedia("author", 10, false, CandidateRetriever.Language.ES));
+        System.out.println(lucene.getPredicatesInMatoll("married", 10, CandidateRetriever.Language.DE));
+        System.out.println(lucene.getRestrictionClasses("catholic", 10, CandidateRetriever.Language.EN));
         
         
 //        CandidateRetrieverOnMemory memory = new CandidateRetrieverOnMemory("resourceFiles", "classFiles", "predicateFiles", "matollFiles");

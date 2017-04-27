@@ -26,8 +26,6 @@ public class PredicateLoader implements Loader {
 
     //docDirectory => dbpedia *.nt files
     //luceneIndex => lucene creates indexes 
-    
-
     @Override
     public void load(boolean deleteIndexFiles, String indexDirectory, String anchorFilesDirectory) {
 
@@ -53,15 +51,17 @@ public class PredicateLoader implements Loader {
             File folder = new File(anchorFilesDirectory);
             File[] listOfFiles = folder.listFiles();
 
+            
+
             for (int i = 0; i < listOfFiles.length; i++) {
                 if (listOfFiles[i].isFile() && !listOfFiles[i].isHidden()) {
                     String fileExtension = listOfFiles[i].getName().substring(listOfFiles[i].getName().lastIndexOf(".") + 1);
-                    if (fileExtension.equals("ttl")) {
+                    if (fileExtension.equals("ttl") || fileExtension.equals("txt")) {
 
                         try {
-                            PredicateIndexer indexer = new PredicateIndexer(indexDirectory);
 
                             long startTime = System.currentTimeMillis();
+                            PredicateIndexer indexer = new PredicateIndexer(indexDirectory);
 
                             System.out.println(anchorFilesDirectory + listOfFiles[i].getName());
                             indexData(anchorFilesDirectory + listOfFiles[i].getName(), indexer);
@@ -113,7 +113,7 @@ public class PredicateLoader implements Loader {
                 String[] data = line.split("\t");
 
                 if (data.length == 3) {
-                    
+
                     try {
                         String label = data[0];
 
@@ -121,11 +121,37 @@ public class PredicateLoader implements Loader {
 
                         int freq = Integer.parseInt(data[2]);
 
+                        if (!uri.contains("Category:") && !uri.contains("(disambiguation)") && !uri.contains("File:")) {
+                            label = label.toLowerCase();
+
+                            p.addPredicate(label, uri, freq);
+                        }
+                    } catch (Exception e) {
+                    }
+
+                }
+                if (data.length == 2) {
+
+                    try {
+                        String label = data[1];
+
+                        String uri = data[0];
+                        
+                        if(label.contains("@en")){
+                            label = label.substring(0, label.indexOf("@en"));
+                        }
+                        if(label.contains("@de")){
+                            label = label.substring(0, label.indexOf("@de"));
+                        }
+                        if(label.contains("@es")){
+                            label = label.substring(0, label.indexOf("@es"));
+                        }
+                        
 
                         if (!uri.contains("Category:") && !uri.contains("(disambiguation)") && !uri.contains("File:")) {
                             label = label.toLowerCase();
-                            
-                            p.addPredicate(label, uri, freq);
+
+                            p.addPredicate(label, uri, 1);
                         }
                     } catch (Exception e) {
                     }

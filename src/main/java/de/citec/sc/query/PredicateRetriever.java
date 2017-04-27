@@ -5,7 +5,12 @@
  */
 package de.citec.sc.query;
 
+import de.citec.sc.query.CandidateRetriever.Language;
+import static de.citec.sc.query.CandidateRetriever.Language.DE;
+import static de.citec.sc.query.CandidateRetriever.Language.EN;
+import static de.citec.sc.query.CandidateRetriever.Language.ES;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -20,10 +25,12 @@ import org.apache.lucene.store.RAMDirectory;
  */
 public class PredicateRetriever extends LabelRetriever {
 
-    private String indexPath = "predicatesindex";
+    private String indexPath = "predicateIndex";
     private String directory;
     private StandardAnalyzer analyzer;
-    private Directory indexDirectory;
+    private Directory indexDirectoryEN;
+    private Directory indexDirectoryDE;
+    private Directory indexDirectoryES;
 
     public PredicateRetriever(String directory, boolean loadIntoMemory) {
         this.directory = directory;
@@ -33,12 +40,18 @@ public class PredicateRetriever extends LabelRetriever {
 
     private void initIndexDirectory(boolean loadToMemory) {
         try {
-            String path = directory + "/" + this.indexPath + "/";
+            String pathEN = directory + "/en/" + this.indexPath + "/";
+            String pathDE = directory + "/de/" + this.indexPath + "/";
+            String pathES = directory + "/es/" + this.indexPath + "/";
             analyzer = new StandardAnalyzer();
             if (loadToMemory) {
-                indexDirectory = new RAMDirectory(FSDirectory.open(Paths.get(path)), IOContext.DEFAULT);
+                indexDirectoryEN = new RAMDirectory(FSDirectory.open(Paths.get(pathEN)), IOContext.DEFAULT);
+                indexDirectoryDE = new RAMDirectory(FSDirectory.open(Paths.get(pathDE)), IOContext.DEFAULT);
+                indexDirectoryES = new RAMDirectory(FSDirectory.open(Paths.get(pathES)), IOContext.DEFAULT);
             } else {
-                indexDirectory = FSDirectory.open(Paths.get(path));
+                indexDirectoryEN = FSDirectory.open(Paths.get(pathEN));
+                indexDirectoryDE = FSDirectory.open(Paths.get(pathDE));
+                indexDirectoryES = FSDirectory.open(Paths.get(pathES));
             }
 
         } catch (Exception e) {
@@ -46,16 +59,39 @@ public class PredicateRetriever extends LabelRetriever {
         }
     }
 
-    public List<Instance> getPredicates(String searchTerm, int k, boolean partialMatches) {
+    public List<Instance> getPredicates(String searchTerm, int k, boolean partialMatches, Language lang) {
         super.comparator = super.frequencyComparator;
 
-        List<Instance> result = getDirectMatches(searchTerm, "label", "URI", k, indexDirectory);
-        
+        List<Instance> result = new ArrayList<>();
+        switch (lang) {
+            case EN:
+                result = getDirectMatches(searchTerm, "label", "URI", k, indexDirectoryEN);
+                break;
+            case DE:
+                result = getDirectMatches(searchTerm, "label", "URI", k, indexDirectoryDE);
+                break;
+            case ES:
+                result = getDirectMatches(searchTerm, "label", "URI", k, indexDirectoryES);
+                break;
+        }
+
         if (partialMatches && result.size() < k) {
-            
-            List<Instance> resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectory, analyzer);
-            for(Instance i : resultPartial){
-                if(!result.contains(i)){
+
+            List<Instance> resultPartial = new ArrayList<>();
+
+            switch (lang) {
+                case EN:
+                    resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectoryEN, analyzer);
+                    break;
+                case DE:
+                    resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectoryDE, analyzer);
+                    break;
+                case ES:
+                    resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectoryES, analyzer);
+                    break;
+            }
+            for (Instance i : resultPartial) {
+                if (!result.contains(i)) {
                     result.add(i);
                 }
             }

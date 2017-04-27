@@ -45,6 +45,7 @@ public class MATOLLTextLoader implements Loader {
                 }
             }
 
+            MATOLLIndexer indexer = new MATOLLIndexer(indexDirectory);
             //load files
             File folder = new File(anchorFilesDirectory);
             File[] listOfFiles = folder.listFiles();
@@ -55,14 +56,14 @@ public class MATOLLTextLoader implements Loader {
                     if (fileExtension.equals("ttl")) {
 
                         try {
-                            MATOLLIndexer indexer = new MATOLLIndexer(indexDirectory);
+                            
 
                             long startTime = System.currentTimeMillis();
 
                             System.out.println(anchorFilesDirectory + listOfFiles[i].getName());
                             indexData(anchorFilesDirectory + listOfFiles[i].getName(), indexer);
 
-                            indexer.finilize();
+                            
 
                             long endTime = System.currentTimeMillis();
                             System.out.println((endTime - startTime) / 1000 + " sec.");
@@ -74,6 +75,8 @@ public class MATOLLTextLoader implements Loader {
 
                 }
             }
+            
+            indexer.finilize();
         } catch (Exception e) {
             e.printStackTrace();
         }

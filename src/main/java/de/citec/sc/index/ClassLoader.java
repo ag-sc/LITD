@@ -26,8 +26,6 @@ public class ClassLoader implements Loader {
 
     //docDirectory => dbpedia *.nt files
     //luceneIndex => lucene creates indexes 
-    
-
     @Override
     public void load(boolean deleteIndexFiles, String indexDirectory, String anchorFilesDirectory) {
 
@@ -53,13 +51,14 @@ public class ClassLoader implements Loader {
             File folder = new File(anchorFilesDirectory);
             File[] listOfFiles = folder.listFiles();
 
+            ClassIndexer indexer = new ClassIndexer(indexDirectory);
+
             for (int i = 0; i < listOfFiles.length; i++) {
                 if (listOfFiles[i].isFile() && !listOfFiles[i].isHidden()) {
                     String fileExtension = listOfFiles[i].getName().substring(listOfFiles[i].getName().lastIndexOf(".") + 1);
-                    if (fileExtension.equals("ttl")) {
+                    if (fileExtension.equals("ttl") || fileExtension.equals("txt")) {
 
                         try {
-                            ClassIndexer indexer = new ClassIndexer(indexDirectory);
 
                             long startTime = System.currentTimeMillis();
 
@@ -113,21 +112,44 @@ public class ClassLoader implements Loader {
                 String[] data = line.split("\t");
 
                 if (data.length == 3) {
-                    
+
                     try {
                         String label = data[0];
 
                         String uri = data[1];
 
                         int freq = Integer.parseInt(data[2]);
-                        
-                        
-
 
                         if (!uri.contains("Category:") && !uri.contains("(disambiguation)") && !uri.contains("File:")) {
                             label = label.toLowerCase();
-                            
+
                             anchorIndexer.addClass(label, uri, freq);
+                        }
+                    } catch (Exception e) {
+                    }
+
+                }
+                if (data.length == 2) {
+
+                    try {
+                        String label = data[1];
+
+                        String uri = data[0];
+
+                        if (label.contains("@en")) {
+                            label = label.substring(0, label.indexOf("@en"));
+                        }
+                        if (label.contains("@de")) {
+                            label = label.substring(0, label.indexOf("@de"));
+                        }
+                        if (label.contains("@es")) {
+                            label = label.substring(0, label.indexOf("@es"));
+                        }
+
+                        if (!uri.contains("Category:") && !uri.contains("(disambiguation)") && !uri.contains("File:")) {
+                            label = label.toLowerCase();
+
+                            anchorIndexer.addClass(label, uri, 1);
                         }
                     } catch (Exception e) {
                     }

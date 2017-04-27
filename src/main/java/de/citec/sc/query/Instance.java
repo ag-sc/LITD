@@ -149,6 +149,9 @@ public class Instance implements Comparable<Instance> {
         return true;
     }
 
+    public Instance clone(){
+        return new Instance(uri, preposition, pos, frame, subj, obj, freq);
+    }
     
 
 

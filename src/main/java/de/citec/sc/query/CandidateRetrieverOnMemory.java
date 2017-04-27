@@ -31,38 +31,85 @@ import java.util.stream.Stream;
  */
 public class CandidateRetrieverOnMemory implements CandidateRetriever {
 
-    private ConcurrentHashMap<String, List<Instance>> resourceIndex;
-    private ConcurrentHashMap<String, List<Instance>> classIndex;
-    private ConcurrentHashMap<String, List<Instance>> predicateIndex;
-    private ConcurrentHashMap<String, List<Instance>> matollPredicateIndex;
-    private ConcurrentHashMap<String, List<Instance>> matollRestrictionClassIndex;
+    private ConcurrentHashMap<String, List<Instance>> resourceIndexEN;
+    private ConcurrentHashMap<String, List<Instance>> classIndexEN;
+    private ConcurrentHashMap<String, List<Instance>> predicateIndexEN;
+    private ConcurrentHashMap<String, List<Instance>> matollPredicateIndexEN;
+    private ConcurrentHashMap<String, List<Instance>> matollRestrictionClassIndexEN;
 
-    public CandidateRetrieverOnMemory(String resourceDirectory, String classDirectory, String predicateDirectory, String matollPredicateDirectory, String matollRestrictionClassDirectory) {
+    private ConcurrentHashMap<String, List<Instance>> resourceIndexDE;
+    private ConcurrentHashMap<String, List<Instance>> classIndexDE;
+    private ConcurrentHashMap<String, List<Instance>> predicateIndexDE;
+    private ConcurrentHashMap<String, List<Instance>> matollPredicateIndexDE;
+    private ConcurrentHashMap<String, List<Instance>> matollRestrictionClassIndexDE;
+
+    private ConcurrentHashMap<String, List<Instance>> resourceIndexES;
+    private ConcurrentHashMap<String, List<Instance>> classIndexES;
+    private ConcurrentHashMap<String, List<Instance>> predicateIndexES;
+    private ConcurrentHashMap<String, List<Instance>> matollPredicateIndexES;
+    private ConcurrentHashMap<String, List<Instance>> matollRestrictionClassIndexES;
+
+    public CandidateRetrieverOnMemory(String directory) {
         System.out.println("Loading index files ...");
-
-        resourceIndex = new ConcurrentHashMap<>(15000000);
-        loadFiles(resourceDirectory, resourceIndex);
-
-        classIndex = new ConcurrentHashMap<>(20000);
-        loadFiles(classDirectory, classIndex);
-
-        predicateIndex = new ConcurrentHashMap<>(20000);
-        loadFiles(predicateDirectory, predicateIndex);
-
-        matollPredicateIndex = new ConcurrentHashMap<>(50000);
-        loadFiles(matollPredicateDirectory, matollPredicateIndex);
-
-        matollRestrictionClassIndex = new ConcurrentHashMap<>(50000);
-        loadFiles(matollRestrictionClassDirectory, matollRestrictionClassIndex);
+        
+        //English files
+        resourceIndexEN = new ConcurrentHashMap<>(5000000);
+        loadFiles(directory + "/en/resourceFiles", resourceIndexEN);
+        classIndexEN = new ConcurrentHashMap<>(1000);
+        loadFiles(directory + "/en/resourceFiles", classIndexEN);
+        predicateIndexEN = new ConcurrentHashMap<>(5000);
+        loadFiles(directory + "/en/resourceFiles", predicateIndexEN);
+        matollPredicateIndexEN = new ConcurrentHashMap<>(10000);
+        loadFiles(directory + "/en/resourceFiles", matollPredicateIndexEN);
+        matollRestrictionClassIndexEN = new ConcurrentHashMap<>(1000);
+        loadFiles(directory + "/en/resourceFiles", matollRestrictionClassIndexEN);
+        
+        //German files
+        resourceIndexDE = new ConcurrentHashMap<>(5000000);
+        loadFiles(directory + "/en/resourceFiles", resourceIndexDE);
+        classIndexDE = new ConcurrentHashMap<>(1000);
+        loadFiles(directory + "/en/resourceFiles", classIndexDE);
+        predicateIndexDE = new ConcurrentHashMap<>(5000);
+        loadFiles(directory + "/en/resourceFiles", predicateIndexDE);
+        matollPredicateIndexDE = new ConcurrentHashMap<>(10000);
+        loadFiles(directory + "/en/resourceFiles", matollPredicateIndexDE);
+        matollRestrictionClassIndexDE = new ConcurrentHashMap<>(1000);
+        loadFiles(directory + "/en/resourceFiles", matollRestrictionClassIndexDE);
+        
+        //Spanish files
+        resourceIndexES = new ConcurrentHashMap<>(5000000);
+        loadFiles(directory + "/en/resourceFiles", resourceIndexES);
+        classIndexES = new ConcurrentHashMap<>(1000);
+        loadFiles(directory + "/en/resourceFiles", classIndexES);
+        predicateIndexES = new ConcurrentHashMap<>(5000);
+        loadFiles(directory + "/en/resourceFiles", predicateIndexES);
+        matollPredicateIndexES = new ConcurrentHashMap<>(10000);
+        loadFiles(directory + "/en/resourceFiles", matollPredicateIndexES);
+        matollRestrictionClassIndexES = new ConcurrentHashMap<>(1000);
+        loadFiles(directory + "/en/resourceFiles", matollRestrictionClassIndexES);
     }
 
     @Override
-    public List<Instance> getAllResources(String searchTerm, int topK) {
+    public List<Instance> getAllResources(String searchTerm, int topK, Language lang) {
 
         List<Instance> matches = new ArrayList<>();
-        
-        if(resourceIndex.containsKey(searchTerm)){
-            matches = resourceIndex.get(searchTerm);
+
+        switch (lang) {
+            case EN:
+                if (resourceIndexEN.containsKey(searchTerm)) {
+                    matches = resourceIndexEN.get(searchTerm);
+                }
+                break;
+            case DE:
+                if (resourceIndexDE.containsKey(searchTerm)) {
+                    matches = resourceIndexDE.get(searchTerm);
+                }
+                break;
+            case ES:
+                if (resourceIndexES.containsKey(searchTerm)) {
+                    matches = resourceIndexES.get(searchTerm);
+                }
+                break;
         }
 
         List<Instance> result = new ArrayList<>();
@@ -85,17 +132,38 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
     }
 
     @Override
-    public List<Instance> getAllPredicates(String searchTerm, int topK) {
+    public List<Instance> getAllPredicates(String searchTerm, int topK, Language lang) {
         List<Instance> matches = new ArrayList<>();
-        
-        if(predicateIndex.containsKey(searchTerm)){
-            matches = predicateIndex.get(searchTerm);
-        }
-        
-        if(matollPredicateIndex.containsKey(searchTerm)){
-            matches.addAll(matollPredicateIndex.get(searchTerm));
-        }
 
+        switch (lang) {
+            case EN:
+                if (predicateIndexEN.containsKey(searchTerm)) {
+                    matches = predicateIndexEN.get(searchTerm);
+                }
+
+                if (matollPredicateIndexEN.containsKey(searchTerm)) {
+                    matches.addAll(matollPredicateIndexEN.get(searchTerm));
+                }
+                break;
+            case DE:
+                if (predicateIndexDE.containsKey(searchTerm)) {
+                    matches = predicateIndexDE.get(searchTerm);
+                }
+
+                if (matollPredicateIndexDE.containsKey(searchTerm)) {
+                    matches.addAll(matollPredicateIndexDE.get(searchTerm));
+                }
+                break;
+            case ES:
+                if (predicateIndexES.containsKey(searchTerm)) {
+                    matches = predicateIndexES.get(searchTerm);
+                }
+
+                if (matollPredicateIndexES.containsKey(searchTerm)) {
+                    matches.addAll(matollPredicateIndexES.get(searchTerm));
+                }
+                break;
+        }
 
         List<Instance> result = new ArrayList<>();
 
@@ -116,12 +184,26 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
     }
 
     @Override
-    public List<Instance> getPredicatesInMatoll(String searchTerm, int topK) {
+    public List<Instance> getPredicatesInMatoll(String searchTerm, int topK, Language lang) {
 
         List<Instance> matches = new ArrayList<>();
-        
-        if(matollPredicateIndex.containsKey(searchTerm)){
-            matches = matollPredicateIndex.get(searchTerm);
+
+        switch (lang) {
+            case EN:
+                if (matollPredicateIndexEN.containsKey(searchTerm)) {
+                    matches = matollPredicateIndexEN.get(searchTerm);
+                }
+                break;
+            case DE:
+                if (matollPredicateIndexDE.containsKey(searchTerm)) {
+                    matches = matollPredicateIndexDE.get(searchTerm);
+                }
+                break;
+            case ES:
+                if (matollPredicateIndexES.containsKey(searchTerm)) {
+                    matches = matollPredicateIndexES.get(searchTerm);
+                }
+                break;
         }
 
         List<Instance> result = new ArrayList<>();
@@ -143,24 +225,57 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
     }
 
     @Override
-    public List<Instance> getAllClasses(String searchTerm, int topK, boolean partialMatch) {
+    public List<Instance> getAllClasses(String searchTerm, int topK, boolean partialMatch, Language lang) {
         List<Instance> result = new ArrayList<>();
         List<Instance> matches = new ArrayList<>();
 
         if (!partialMatch) {
 
-            if(classIndex.containsKey(searchTerm)){
-                matches = classIndex.get(searchTerm);
+            switch (lang) {
+                case EN:
+                    if (classIndexEN.containsKey(searchTerm)) {
+                        matches = classIndexEN.get(searchTerm);
+                    }
+                    break;
+                case DE:
+                    if (classIndexDE.containsKey(searchTerm)) {
+                        matches = classIndexDE.get(searchTerm);
+                    }
+                    break;
+                case ES:
+                    if (classIndexES.containsKey(searchTerm)) {
+                        matches = classIndexES.get(searchTerm);
+                    }
+                    break;
             }
 
         } else {
 
             //partial match
-            for (String label : classIndex.keySet()) {
-                if (label.contains(searchTerm) || searchTerm.contains(label)) {
-                    matches.addAll(classIndex.get(label));
-                }
+            switch (lang) {
+                case EN:
+                    for (String label : classIndexEN.keySet()) {
+                        if (label.contains(searchTerm) || searchTerm.contains(label)) {
+                            matches.addAll(classIndexEN.get(label));
+                        }
+                    }
+                    break;
+                case DE:
+                    for (String label : classIndexDE.keySet()) {
+                        if (label.contains(searchTerm) || searchTerm.contains(label)) {
+                            matches.addAll(classIndexDE.get(label));
+                        }
+                    }
+                    break;
+                case ES:
+                    for (String label : classIndexES.keySet()) {
+                        if (label.contains(searchTerm) || searchTerm.contains(label)) {
+                            matches.addAll(classIndexES.get(label));
+                        }
+                    }
+                    break;
             }
+
         }
 
         if (!matches.isEmpty()) {
@@ -180,12 +295,26 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
     }
 
     @Override
-    public List<Instance> getRestrictionClasses(String searchTerm, int topK) {
+    public List<Instance> getRestrictionClasses(String searchTerm, int topK, Language lang) {
 
         List<Instance> matches = new ArrayList<>();
-        
-        if(matollRestrictionClassIndex.containsKey(searchTerm)){
-            matches = matollRestrictionClassIndex.get(searchTerm);
+
+        switch (lang) {
+            case EN:
+                if (matollRestrictionClassIndexEN.containsKey(searchTerm)) {
+                    matches = matollRestrictionClassIndexEN.get(searchTerm);
+                }
+                break;
+            case DE:
+                if (matollRestrictionClassIndexDE.containsKey(searchTerm)) {
+                    matches = matollRestrictionClassIndexDE.get(searchTerm);
+                }
+                break;
+            case ES:
+                if (matollRestrictionClassIndexES.containsKey(searchTerm)) {
+                    matches = matollRestrictionClassIndexES.get(searchTerm);
+                }
+                break;
         }
 
         List<Instance> result = new ArrayList<>();
@@ -235,6 +364,15 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
                                 label = c[0].toLowerCase();
                                 String uri = c[1];
                                 int freq = Integer.parseInt(c[2]);
+
+                                instance = new Instance(uri, freq);
+
+                            }
+                            if (c.length == 2) {
+
+                                label = c[1].toLowerCase();
+                                String uri = c[0];
+                                int freq = 1;
 
                                 instance = new Instance(uri, freq);
 
@@ -300,28 +438,60 @@ public class CandidateRetrieverOnMemory implements CandidateRetriever {
     }
 
     @Override
-    public List<Instance> getPredicatesInDBpedia(String searchTerm, int topK, boolean partialMatch) {
+    public List<Instance> getPredicatesInDBpedia(String searchTerm, int topK, boolean partialMatch, Language lang) {
 
         List<Instance> result = new ArrayList<>();
         List<Instance> matches = new ArrayList<>();
 
         if (!partialMatch) {
 
-            if(predicateIndex.containsKey(searchTerm)){
-                matches = predicateIndex.get(searchTerm);
+            switch (lang) {
+                case EN:
+                    if (predicateIndexEN.containsKey(searchTerm)) {
+                        matches = predicateIndexEN.get(searchTerm);
+                    }
+                    break;
+                case DE:
+                    if (predicateIndexDE.containsKey(searchTerm)) {
+                        matches = predicateIndexDE.get(searchTerm);
+                    }
+                    break;
+                case ES:
+                    if (predicateIndexES.containsKey(searchTerm)) {
+                        matches = predicateIndexES.get(searchTerm);
+                    }
+                    break;
             }
 
         } else {
 
             //partial match
-            for (String label : predicateIndex.keySet()) {
-                if (label.contains(searchTerm) || searchTerm.contains(label)) {
-                    matches.addAll(predicateIndex.get(label));
-                }
+            switch (lang) {
+                case EN:
+                    for (String label : predicateIndexEN.keySet()) {
+                        if (label.contains(searchTerm) || searchTerm.contains(label)) {
+                            matches.addAll(predicateIndexEN.get(label));
+                        }
+                    }
+                    break;
+                case DE:
+                    for (String label : predicateIndexDE.keySet()) {
+                        if (label.contains(searchTerm) || searchTerm.contains(label)) {
+                            matches.addAll(predicateIndexDE.get(label));
+                        }
+                    }
+                    break;
+                case ES:
+                    for (String label : predicateIndexES.keySet()) {
+                        if (label.contains(searchTerm) || searchTerm.contains(label)) {
+                            matches.addAll(predicateIndexES.get(label));
+                        }
+                    }
+                    break;
             }
+
         }
 
-        
         if (!matches.isEmpty()) {
             //sort by frequency
             Collections.sort(matches);

@@ -94,12 +94,12 @@ public class MATOLLIndexer implements Indexer {
                 throw new RuntimeException("The indexes directory path must be specified");
             }
 
-            predicatesIndexPath = Paths.get(folderPath, "predicatesindex");
+            predicatesIndexPath = Paths.get(folderPath, "matollPredicateIndex");
             predicatesIndexWriter = initIndexWriter(predicatesIndexPath);
             predicatesDoc = new Document();
             
             
-            classesIndexPath = Paths.get(folderPath, "classesindex");
+            classesIndexPath = Paths.get(folderPath, "matollClassIndex");
             classesIndexWriter = initIndexWriter(classesIndexPath);
             classesDoc = new Document();
             

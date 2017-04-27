@@ -56,7 +56,7 @@ public class AnchorTextIndexer implements Indexer {
                 throw new RuntimeException("The indexes directory path must be specified");
             }
 
-            predicatesIndexPath = Paths.get(folderPath, "anchorsindex");
+            predicatesIndexPath = Paths.get(folderPath, "resourceIndex");
             predicatesIndexWriter = initIndexWriter(predicatesIndexPath);
             predicatesDoc = new Document();
         } catch (Exception e) {

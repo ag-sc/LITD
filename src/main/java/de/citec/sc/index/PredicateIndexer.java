@@ -60,7 +60,7 @@ public class PredicateIndexer implements Indexer {
                 throw new RuntimeException("The indexes directory path must be specified");
             }
 
-            predicatesIndexPath = Paths.get(folderPath, "predicatesindex");
+            predicatesIndexPath = Paths.get(folderPath, "predicateIndex");
             predicatesIndexWriter = initIndexWriter(predicatesIndexPath);
             predicatesDoc = new Document();
         } catch (Exception e) {

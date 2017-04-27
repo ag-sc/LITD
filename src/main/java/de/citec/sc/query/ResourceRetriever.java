@@ -8,6 +8,7 @@ package de.citec.sc.query;
 import de.citec.sc.query.CandidateRetriever.Language;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -20,16 +21,16 @@ import org.apache.lucene.store.RAMDirectory;
  *
  * @author sherzod
  */
-public class ClassRetriever extends LabelRetriever {
+public class ResourceRetriever extends LabelRetriever {
 
-    private String indexPath = "classIndex";
+    private String indexPath = "resourceIndex";
     private String directory;
     private StandardAnalyzer analyzer;
     private Directory indexDirectoryEN;
     private Directory indexDirectoryDE;
     private Directory indexDirectoryES;
 
-    public ClassRetriever(String directory, boolean loadIntoMemory) {
+    public ResourceRetriever(String directory, boolean loadIntoMemory) {
         this.directory = directory;
 
         initIndexDirectory(loadIntoMemory);
@@ -40,6 +41,7 @@ public class ClassRetriever extends LabelRetriever {
             String pathEN = directory + "/en/" + this.indexPath + "/";
             String pathDE = directory + "/de/" + this.indexPath + "/";
             String pathES = directory + "/es/" + this.indexPath + "/";
+            
             analyzer = new StandardAnalyzer();
             if (loadToMemory) {
                 indexDirectoryEN = new RAMDirectory(FSDirectory.open(Paths.get(pathEN)), IOContext.DEFAULT);
@@ -56,11 +58,10 @@ public class ClassRetriever extends LabelRetriever {
         }
     }
 
-    public List<Instance> getClasses(String searchTerm, int k, boolean partialMatches, Language lang) {
+    public List<Instance> getResources(String searchTerm, int k, Language lang) {
         super.comparator = super.frequencyComparator;
-
         List<Instance> result = new ArrayList<>();
-        switch (lang) {
+        switch(lang){
             case EN:
                 result = getDirectMatches(searchTerm, "label", "URI", k, indexDirectoryEN);
                 break;
@@ -70,28 +71,6 @@ public class ClassRetriever extends LabelRetriever {
             case ES:
                 result = getDirectMatches(searchTerm, "label", "URI", k, indexDirectoryES);
                 break;
-        }
-
-        if (partialMatches && result.size() < k) {
-
-            List<Instance> resultPartial = new ArrayList<>();
-
-            switch (lang) {
-                case EN:
-                    resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectoryEN, analyzer);
-                    break;
-                case DE:
-                    resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectoryDE, analyzer);
-                    break;
-                case ES:
-                    resultPartial = getPartialMatches(searchTerm, "labelTokenized", "URI", k - result.size(), indexDirectoryES, analyzer);
-                    break;
-            }
-            for (Instance i : resultPartial) {
-                if (!result.contains(i)) {
-                    result.add(i);
-                }
-            }
         }
 
         return result;
