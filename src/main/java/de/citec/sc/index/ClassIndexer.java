@@ -10,7 +10,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LegacyIntField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
@@ -38,7 +38,7 @@ public class ClassIndexer implements Indexer {
         Field uriField = new StringField("URI", uri, Field.Store.YES);
         predicatesDoc.add(uriField);
 
-        Field freqField = new IntField("freq", freq, Field.Store.YES);
+        Field freqField = new LegacyIntField("freq", freq, Field.Store.YES);
         predicatesDoc.add(freqField);
 
         predicatesIndexWriter.addDocument(predicatesDoc);

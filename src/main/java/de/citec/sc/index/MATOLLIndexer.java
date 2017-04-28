@@ -10,7 +10,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LegacyIntField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -57,7 +57,7 @@ public class MATOLLIndexer implements Indexer {
         Field objectField = new StringField("Object", object, Field.Store.YES);
         predicatesDoc.add(objectField);
 
-        Field freqField = new IntField("freq", freq, Field.Store.YES);
+        Field freqField = new LegacyIntField("freq", freq, Field.Store.YES);
         predicatesDoc.add(freqField);
 
         predicatesIndexWriter.addDocument(predicatesDoc);
@@ -72,7 +72,7 @@ public class MATOLLIndexer implements Indexer {
         Field uriField = new StringField("URI", uri, Field.Store.YES);
         classesDoc.add(uriField);
 
-        Field freqField = new IntField("freq", freq, Field.Store.YES);
+        Field freqField = new LegacyIntField("freq", freq, Field.Store.YES);
         classesDoc.add(freqField);
 
         classesIndexWriter.addDocument(classesDoc);

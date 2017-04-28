@@ -33,7 +33,7 @@ public class PredicateLoader implements Loader {
         try {
             File indexFolder = new File(indexDirectory);
             if (!indexFolder.exists()) {
-                indexFolder.mkdir();
+                indexFolder.mkdirs();
                 System.out.println(indexDirectory + " directory is created!");
             }
             //delete old indice files        
